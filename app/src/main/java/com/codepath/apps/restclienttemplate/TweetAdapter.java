@@ -1,23 +1,32 @@
 package com.codepath.apps.restclienttemplate;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 
+import org.parceler.Parcels;
+
 import java.util.List;
 
-public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder>{
-    //
+public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> {
+    final int REPLY_TWEET_CODE = 90;
+
     private List<Tweet> mTweets;
+
     private Context context;
+    ViewHolder viewHolder;
+
     //    // pass in the Tweets array in the constructor
     public TweetAdapter(List<Tweet> tweets) {
         mTweets = tweets;
@@ -31,7 +40,7 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder>{
         LayoutInflater inflater = LayoutInflater.from(context);
 
         View tweetView = inflater.inflate(R.layout.item_tweet, viewGroup, false);
-        ViewHolder viewHolder = new ViewHolder(tweetView);
+        viewHolder = new ViewHolder(tweetView);
         return viewHolder;
     }
 
@@ -40,13 +49,32 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder>{
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         // get the data according to position
-        Tweet tweet = mTweets.get(position);
+        final Tweet tweet = mTweets.get(position);
         viewHolder.tvUsername.setText(tweet.user.name);
         viewHolder.tvBody.setText(tweet.body);
         viewHolder.tvDate.setText(tweet.getRelativeTimeAgo(tweet.createdAt));
-
         Glide.with(context).load(tweet.user.profileImageUrl).into(viewHolder.ivProfileImage);
+        viewHolder.btnReplyTweet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, ReplyActivity.class);
+                intent.putExtra("tweet", Parcels.wrap(tweet));
+                Log.d("user", tweet.user.name);
+                context.startActivity(intent);
+            }
+        });
     }
+
+    public void clear() {
+        mTweets.clear();
+        notifyDataSetChanged();
+    }
+
+    public void addAll(List<Tweet> list) {
+        mTweets.addAll(list);
+        notifyDataSetChanged();
+    }
+
 
     @Override
     public int getItemCount() {
@@ -54,11 +82,13 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder>{
     }
     // create Viewholder class
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView ivProfileImage;
         public TextView tvUsername;
         public TextView tvBody;
         public TextView tvDate;
+        public ImageButton btnReplyTweet;
+
         public ViewHolder(View itemView) {
             super(itemView);
 
@@ -66,7 +96,13 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder>{
             tvUsername = itemView.findViewById(R.id.tvUserName);
             tvBody = (TextView) itemView.findViewById(R.id.tvBody);
             tvDate = (TextView) itemView.findViewById(R.id.tvDate);
+            btnReplyTweet = itemView.findViewById(R.id.btnReplyTweet);
+        }
+
+
+
+
         }
     }
 
-}
+

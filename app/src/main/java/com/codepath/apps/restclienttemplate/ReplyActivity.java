@@ -20,7 +20,7 @@ import org.parceler.Parcels;
 
 import cz.msebera.android.httpclient.Header;
 
-public class ComposeActivity extends AppCompatActivity {
+public class ReplyActivity extends AppCompatActivity {
     TwitterClient client;
     EditText etTweetEdit;
     TextView tvNumCharacters;
@@ -33,17 +33,20 @@ public class ComposeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_compose);
+        setContentView(R.layout.activity_reply);
+
         client = TwitterApp.getRestClient(this);
         etTweetEdit = findViewById(R.id.editTweet);
         tvNumCharacters = findViewById(R.id.tvNumCharacters);
         context = this;
-        getSupportActionBar().setTitle("Compose a Tweet");
-        if(getIntent().getParcelableExtra("tweet") != null){
-            replyUser = getIntent().getParcelableExtra("user");
-            replyTweet = getIntent().getParcelableExtra("tweet");
+        replyTweet = Parcels.unwrap(getIntent().getParcelableExtra("tweet"));
+        replyUser = replyTweet.user;
+        etTweetEdit.setText(String.format("@%s", replyUser.screenName));
+        String message = (279 - replyUser.screenName.length()) + " characters remaining";
+        tvNumCharacters.setText(message);
+        getSupportActionBar().setTitle(String.format("Reply to %s", replyUser.screenName));
 
-        }
+
         etTweetEdit.addTextChangedListener(new TextWatcher() {
                                                @Override
                                                public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -66,8 +69,8 @@ public class ComposeActivity extends AppCompatActivity {
 
     }
 
-    public void onComposeSubmit(View v) {
-        client.sendTweet(etTweetEdit.getText().toString(), new JsonHttpResponseHandler() {
+    public void onSubmit(View v) {
+        client.replyTweet(etTweetEdit.getText().toString(), replyTweet.status_id, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         try {
@@ -83,6 +86,10 @@ public class ComposeActivity extends AppCompatActivity {
 
                     }
 
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                        super.onFailure(statusCode, headers, responseString, throwable);
+                    }
                 }
         );
 
@@ -93,4 +100,5 @@ public class ComposeActivity extends AppCompatActivity {
         setResult(RESULT_NO_TWEET, intent);
         finish();
     }
+
 }
