@@ -70,7 +70,7 @@ public class ReplyActivity extends AppCompatActivity {
     }
 
     public void onSubmit(View v) {
-        client.replyTweet(etTweetEdit.getText().toString(), replyTweet.status_id, new JsonHttpResponseHandler() {
+        client.replyTweet(etTweetEdit.getText().toString(), replyTweet.uid, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         try {

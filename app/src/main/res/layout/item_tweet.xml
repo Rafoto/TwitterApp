@@ -60,22 +60,35 @@
 
     <ImageButton
         android:id="@+id/btnReplyTweet"
-        android:layout_width="30dp"
-        android:layout_height="29dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/tvBody"
         android:layout_marginTop="15dp"
-        android:background="#12171D"
+        android:background="#00FFFFFF"
+        android:onClick="onTweetClicked"
         android:tint="#00FFFFFF"
-        app:srcCompat="@drawable/vector_compose_dm_shortcut"
-        android:onClick="onTweetClicked"/>
+        app:srcCompat="@drawable/vector_compose_dm_fab" />
 
     <ImageButton
         android:id="@+id/btnLikeTweet"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/tvBody"
-        android:layout_marginStart="18dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
         android:layout_toEndOf="@+id/btnReplyTweet"
+        android:background="#00FFFFFF"
+        android:tint="#FFFFFF"
         app:srcCompat="@drawable/ic_vector_heart_stroke" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/btnLikeTweet"
+        android:layout_marginStart="18dp"
+        android:layout_marginTop="0dp"
+        android:layout_toEndOf="@+id/btnLikeTweet"
+        android:tint="#FFFFFF"
+        app:srcCompat="@drawable/ic_vector_retweet_stroke" />
 </RelativeLayout>

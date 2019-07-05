@@ -37,6 +37,7 @@ public class TimelineActivity extends AppCompatActivity {
     SwipeRefreshLayout swipeContainer;
     MenuItem miActionProgressItem;
     Context context;
+    boolean isFirstLoad;
     final int COMPOSE_TWEET_CODE = 20;
     final int REPLY_TWEET_CODE = 90;
 
@@ -45,11 +46,11 @@ public class TimelineActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
+
         client = TwitterApp.getRestClient(this);
         getSupportActionBar().setTitle("Twitter");
         miActionProgressItem = findViewById(R.id.miActionProgress);
         context = this;
-        populateTimeline();
         // find the RecyclerView
         rvTweets = (RecyclerView) findViewById(R.id.rvTweet);
         // init the arraylist
@@ -77,8 +78,17 @@ public class TimelineActivity extends AppCompatActivity {
 
         rvTweets.setLayoutManager(new LinearLayoutManager(this));
         rvTweets.setAdapter(tweetAdapter);
+        rvTweets.addOnScrollListener(new EndlessRecyclerViewScrollListener((LinearLayoutManager) rvTweets.getLayoutManager()) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                populateTimeline(false);
+
+            }
+        });
         this.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#243447")));
-        populateTimeline();
+        populateTimeline(true);
+
+
     }
 
     @Override
@@ -130,11 +140,15 @@ public class TimelineActivity extends AppCompatActivity {
 //        });
         showProgressBar();
         tweetAdapter.clear();
-        populateTimeline();
+        populateTimeline(true);
         hideProgressBar();
     }
 
-    private void populateTimeline() {
+    private void populateTimeline(boolean isFirstLoad) {
+        long max_id = 0;
+        if (!isFirstLoad) {
+            max_id = tweets.get(tweets.size() - 1).uid - 1;
+        }
         client.getHomeTimeline(new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -155,8 +169,8 @@ public class TimelineActivity extends AppCompatActivity {
 //                Log.d("TwitterClient", response.toString());
                 // iterate through the JSON array
                 // for each entry, deserialize the JSON object
-                for (int i = 0; i < response.length(); i++) {
 
+                for (int i = 0; i < response.length(); i++) {
                     // convert each object to a Tweet model
                     // add that Tweet model
                     // notify the adapter
@@ -170,7 +184,10 @@ public class TimelineActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+
                 }
+
+
             }
 
             @Override
@@ -191,7 +208,7 @@ public class TimelineActivity extends AppCompatActivity {
                 Log.d("TwitterClient", responseString);
                 throwable.printStackTrace();
             }
-        });
+        }, max_id);
     }
 
     @Override
