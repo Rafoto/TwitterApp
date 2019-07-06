@@ -6,6 +6,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,6 +67,25 @@ public class ComposeTweeFragment extends DialogFragment {
         etTweetEdit.requestFocus();
         getDialog().getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        etTweetEdit.addTextChangedListener(new TextWatcher() {
+                                               @Override
+                                               public void onTextChanged(CharSequence s, int start, int before, int count) {
+                                                   String message = (280 - s.length()) + " characters remaining";
+                                                   tvNumCharacters.setText(message);
+                                               }
+
+                                               @Override
+                                               public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                                               }
+
+                                               @Override
+                                               public void afterTextChanged(Editable s) {
+
+                                               }
+                                           }
+        );
+
 
 
     }
