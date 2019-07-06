@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
-public class TimelineActivity extends AppCompatActivity {
+public class TimelineActivity extends AppCompatActivity implements ComposeTweeFragment.OnFragmentInteractionListener {
     TwitterClient client;
     TweetAdapter tweetAdapter;
     ArrayList<Tweet> tweets;
@@ -37,6 +38,7 @@ public class TimelineActivity extends AppCompatActivity {
     SwipeRefreshLayout swipeContainer;
     MenuItem miActionProgressItem;
     Context context;
+    ComposeTweeFragment composeFragment;
     boolean isFirstLoad;
     final int COMPOSE_TWEET_CODE = 20;
     final int REPLY_TWEET_CODE = 90;
@@ -49,6 +51,7 @@ public class TimelineActivity extends AppCompatActivity {
 
         client = TwitterApp.getRestClient(this);
         getSupportActionBar().setTitle("Twitter");
+
         miActionProgressItem = findViewById(R.id.miActionProgress);
         context = this;
         // find the RecyclerView
@@ -235,7 +238,37 @@ public class TimelineActivity extends AppCompatActivity {
     public void composeButtonClick(View view) {
         int id = view.getId();
         Intent intent = new Intent(this, ComposeActivity.class);
-        this.startActivityForResult(intent, COMPOSE_TWEET_CODE);
+//        this.startActivityForResult(intent, COMPOSE_TWEET_CODE);
+        showEditDialog();
+    }
+
+    private void showEditDialog() {
+        FragmentManager fm = getSupportFragmentManager();
+        composeFragment = ComposeTweeFragment.newInstance();
+        composeFragment.show(fm, "ComposeTweeFragment");
+
+    }
+    @Override
+    public void onFragmentInteraction() {
+        client.sendTweet(composeFragment.etTweetEdit.getText().toString(), new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        try {
+                            Tweet tweet = Tweet.fromJSON(response);
+                            Intent intent = new Intent(context, TimelineActivity.class);
+                            intent.putExtra("tweet", Parcels.wrap(tweet));
+                            setResult(RESULT_OK, intent);
+                            finish();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+
+                }
+        );
+
     }
 
     public void detailView(View view) {
@@ -246,20 +279,19 @@ public class TimelineActivity extends AppCompatActivity {
             startActivity(intent);
         }
     }
-//    public void onTweetClicked(View view) {
-//
-//
-//        if (tweetAdapter.viewHolder.getAdapterPosition() != RecyclerView.NO_POSITION) { // Check if an item was deleted, but the user clicked it before the UI removed it
-//            Tweet tweet = tweets.get(tweetAdapter.viewHolder.getAdapterPosition());
-//            // We can access the data within the views
-//            Intent intent = new Intent(context, ReplyActivity.class);
-//            intent.putExtra("tweet", Parcels.wrap(tweet));
-//            intent.putExtra("user", Parcels.wrap(tweet.user));
-//            Log.d("user", tweet.user.name);
-//            this.startActivityForResult(intent, REPLY_TWEET_CODE);
-//        }
-//    }
+
+    public void closeComposeDialog(View view) {
+        composeFragment.dismiss();
+    }
+
+    public void onTweetComposed(View view) {
+        onFragmentInteraction();
+        composeFragment.dismiss();
+    }
 
 
+    public void retweet(View view) {
+
+    }
 }
 

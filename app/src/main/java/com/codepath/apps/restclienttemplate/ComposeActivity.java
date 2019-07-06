@@ -11,7 +11,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.codepath.apps.restclienttemplate.models.Tweet;
-import com.codepath.apps.restclienttemplate.models.User;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONException;
@@ -27,8 +26,6 @@ public class ComposeActivity extends AppCompatActivity {
     Context context;
     final int RESULT_OK = 10;
     final int RESULT_NO_TWEET = 18;
-    Tweet replyTweet;
-    User replyUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +36,6 @@ public class ComposeActivity extends AppCompatActivity {
         tvNumCharacters = findViewById(R.id.tvNumCharacters);
         context = this;
         getSupportActionBar().setTitle("Compose a Tweet");
-        if(getIntent().getParcelableExtra("tweet") != null){
-            replyUser = getIntent().getParcelableExtra("user");
-            replyTweet = getIntent().getParcelableExtra("tweet");
-
-        }
         etTweetEdit.addTextChangedListener(new TextWatcher() {
                                                @Override
                                                public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -87,6 +79,7 @@ public class ComposeActivity extends AppCompatActivity {
         );
 
     }
+
 
     public void goBack(View view) {
         Intent intent = new Intent(context, TimelineActivity.class);

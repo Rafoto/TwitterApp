@@ -43,6 +43,7 @@ public class TwitterClient extends OAuthBaseClient {
 	// CHANGE THIS
 	// DEFINE METHODS for different API endpoints here
 	public void getHomeTimeline(AsyncHttpResponseHandler handler, long max_id) {
+
 		String apiUrl = getApiUrl("statuses/home_timeline.json");
 		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
@@ -54,6 +55,7 @@ public class TwitterClient extends OAuthBaseClient {
 	}
     public void sendTweet(String message, AsyncHttpResponseHandler handler) {
         String apiUrl = getApiUrl("statuses/update.json");
+
         // Can specify query string params directly or through RequestParams.
         RequestParams params = new RequestParams();
         params.put("status", message);
@@ -68,6 +70,23 @@ public class TwitterClient extends OAuthBaseClient {
 		params.put("in_reply_to_status_id", reply_status_id);
 		client.post(apiUrl, params, handler);
 	}
+	public void retweet(long tweet_id, AsyncHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("statuses/retweet/" + tweet_id + ".json");
+
+		// Can specify query string params directly or through RequestParams.
+		RequestParams params = new RequestParams();
+		params.put("id", tweet_id);
+		client.post(apiUrl, params, handler);
+	}
+	public void like(long tweet_id, AsyncHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("favorites/create.json");
+
+		// Can specify query string params directly or through RequestParams.
+		RequestParams params = new RequestParams();
+		params.put("id", tweet_id);
+		client.post(apiUrl, params, handler);
+	}
+
 
 	/* 1. Define the endpoint URL with getApiUrl and pass a relative path to the endpoint
 	 * 	  i.e getApiUrl("statuses/home_timeline.json");

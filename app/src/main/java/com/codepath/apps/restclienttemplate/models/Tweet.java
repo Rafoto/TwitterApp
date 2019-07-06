@@ -17,7 +17,7 @@ public class Tweet {
     public User user;
     public String createdAt;
     public String relativeDate;
-    public int status_id;
+    public String image_url;
 
 
     // deserialize the JSON
@@ -28,6 +28,12 @@ public class Tweet {
         tweet.uid = jsonObject.getLong("id");
         tweet.createdAt = jsonObject.getString("created_at");
         tweet.user = User.fromJSON(jsonObject.getJSONObject("user"));
+        try {
+            tweet.image_url = ((JSONObject) jsonObject.getJSONObject("entities").getJSONArray("media").get(0)).getString("media_url_https");
+        }
+        catch (JSONException jsonexception){
+            tweet.image_url = null;
+        }
         return tweet;
 
     }

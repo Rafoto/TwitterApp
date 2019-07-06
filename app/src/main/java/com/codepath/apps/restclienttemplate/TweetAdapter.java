@@ -14,10 +14,15 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.loopj.android.http.JsonHttpResponseHandler;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.parceler.Parcels;
 
 import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
 
 public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> {
     final int REPLY_TWEET_CODE = 90;
@@ -54,6 +59,9 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
         viewHolder.tvBody.setText(tweet.body);
         viewHolder.tvDate.setText(tweet.getRelativeTimeAgo(tweet.createdAt));
         Glide.with(context).load(tweet.user.profileImageUrl).into(viewHolder.ivProfileImage);
+        if (tweet.image_url != null)
+            Glide.with(context).load(tweet.image_url + "?format=jpg&name=small").into(viewHolder.ivMedia);
+
         viewHolder.btnReplyTweet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,6 +71,83 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
                 context.startActivity(intent);
             }
         });
+        viewHolder.btnLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TwitterApp.getRestClient(context).like(tweet.uid, new JsonHttpResponseHandler(){
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        super.onSuccess(statusCode, headers, response);
+                    }
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                        super.onSuccess(statusCode, headers, response);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                        super.onFailure(statusCode, headers, responseString, throwable);
+                    }
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                        super.onSuccess(statusCode, headers, responseString);
+                    }
+                });
+                Log.d("like", "successful");
+            }
+        });
+
+
+        viewHolder.btnRetweet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TwitterApp.getRestClient(context).retweet(tweet.uid, new JsonHttpResponseHandler(){
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        super.onSuccess(statusCode, headers, response);
+                    }
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                        super.onSuccess(statusCode, headers, response);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                        super.onFailure(statusCode, headers, responseString, throwable);
+                    }
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                        super.onSuccess(statusCode, headers, responseString);
+                    }
+                });
+                Log.d("retweet", "successful");
+            }
+        });
+
     }
 
     public void clear() {
@@ -88,6 +173,9 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
         public TextView tvBody;
         public TextView tvDate;
         public ImageButton btnReplyTweet;
+        public ImageView ivMedia;
+        public ImageView btnRetweet;
+        public ImageButton btnLike;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -97,6 +185,9 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
             tvBody = (TextView) itemView.findViewById(R.id.tvBody);
             tvDate = (TextView) itemView.findViewById(R.id.tvDate);
             btnReplyTweet = itemView.findViewById(R.id.btnReplyTweet);
+            ivMedia = itemView.findViewById(R.id.ivMedia);
+            btnRetweet = itemView.findViewById(R.id.btnRetweet);
+            btnLike = itemView.findViewById(R.id.btnLikeTweet);
         }
 
 
